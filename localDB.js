@@ -32,27 +32,34 @@ var LocalDB = {
   },
   insert  :function(TableName,Obj){
     var Table = LocalDB.table(TableName)
+
     if(Table){
       if(!Obj.id){
         Obj.id = guid()
         Table.push(Obj)
       }
       else{
-        for(var i=0;i<Table.length;i++) if(Table[i].id == Obj.id) Table[i] = Obj
+        var inserted = false
+        for(var i=0;i<Table.length;i++) if(Table[i].id == Obj.id){
+          inserted = true
+          Table[i] = Obj
+        }
+        if(!inserted) Table.push(Obj)
       }
       localStorage[TableName] = JSON.stringify(Table)
     }
+
   },
   delete : function(TableName,Q){
     var Table = LocalDB.table(TableName)
     var e = sift(Q,Table)
     e.forEach(function(row){
       var index = Table.indexOf(row)
-      console.log('Deleting index : ',index)
       Table.splice(index,1)
     })
     localStorage[TableName] = JSON.stringify(Table)
-  }
+  },
+  truncate : function(TableName){localStorage[TableName]='[]'}
 }
 
 
