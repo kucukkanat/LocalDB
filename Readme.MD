@@ -23,3 +23,7 @@ To delete rows from table use queries
 ```
 LocalDB.delete('users',{id:182736})
 ```
+
+###TO-DO
+* Make update function
+* Pack sift with `webpack`
