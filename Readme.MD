@@ -27,4 +27,4 @@ LocalDB.delete('users',{id:182736})
 ###TO-DO
 * Make update function
 * ~~Make npm package~~
-* Pack sift with `webpack`
+* ~~Pack sift with `webpack`~~
