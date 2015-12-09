@@ -47,6 +47,7 @@
 	var sift = __webpack_require__(1)
 
 	if(!window) console.error('This plugin only works in browsers! Not meant for node environment!')
+	module.exports = window.LocalDB
 	window.LocalDB = {
 	  tables : [],
 	  create : function(name){
