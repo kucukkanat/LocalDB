@@ -1,9 +1,7 @@
-try{
-  var e = sift
-}catch(e){
-  console.log('SIFT must be imported to use this library! : https://github.com/crcn/sift.js?utm_source=nodeweekly&utm_medium=email ')
-}
-var LocalDB = {
+var sift = require('sift')
+
+if(!window) console.error('This plugin only works in browsers! Not meant for node environment!')
+window.LocalDB = {
   tables : [],
   create : function(name){
     if(localStorage[name]){
