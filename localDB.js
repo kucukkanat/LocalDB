@@ -1,7 +1,6 @@
 var sift = require('sift')
 
-module.exports = window.localDB
-window.localDB = function(tableName){
+module.exports = function(tableName){
   var getTable = function(name){
     var data;
     if(!localStorage[name]) localStorage[name] = '[]'
