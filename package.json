@@ -8,7 +8,7 @@
 	},
 	"license": "ISC",
 	"author": "htolgasahin@gmail.com",
-	"main": "index.js",
+	"main": "localDB.js",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/kucukkanat/LocalDB.git"
