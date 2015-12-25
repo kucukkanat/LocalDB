@@ -32,7 +32,9 @@ You can  :
 
 Then :
 
-var users = new 
+	var users = new DB('users')
+    
+`index.js` does window.DB = LocalDB to use in browsers
 
 
 ###TO-DO
