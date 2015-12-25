@@ -4,7 +4,6 @@ module.exports = {
     app: ["./localDB.js"]
   },
   output: {
-    path: path.resolve(__dirname, "build"),
     publicPath: "/",
     filename: "index.js"
   }
