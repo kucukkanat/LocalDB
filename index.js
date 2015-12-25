@@ -54,8 +54,7 @@
 
 	var sift = __webpack_require__(2)
 
-	module.exports = window.localDB
-	window.localDB = function(tableName){
+	var LocalDB = function(tableName){
 	  var getTable = function(name){
 	    var data;
 	    if(!localStorage[name]) localStorage[name] = '[]'
@@ -103,6 +102,9 @@
 
 	}
 
+	module.exports = LocalDB
+	if(window) window.LocalDB = LocalDB
+
 	function guid() {
 	  function s4() {
 	    return Math.floor((1 + Math.random()) * 0x10000)
@@ -129,20 +131,20 @@
 
 	(function() {
 
-	  'use strict';
+	  "use strict";
 
 	  /**
 	   */
 
 	  function isFunction(value) {
-	    return typeof value === 'function';
+	    return typeof value === "function";
 	  }
 
 	  /**
 	   */
 
 	  function isArray(value) {
-	    return Object.prototype.toString.call(value) === '[object Array]';
+	    return Object.prototype.toString.call(value) === "[object Array]";
 	  }
 
 	  /**
@@ -163,7 +165,7 @@
 
 	  function or(validator) {
 	    return function(a, b) {
-	      if (!isArray(b) || !b.length) return validator(a, b);
+	      if (!isArray(b)) return validator(a, b);
 	      for (var i = 0, n = b.length; i < n; i++) if (validator(a, b[i])) return true;
 	      return false;
 	    }
@@ -174,7 +176,7 @@
 
 	  function and(validator) {
 	    return function(a, b) {
-	      if (!isArray(b) || !b.length) return validator(a, b);
+	      if (!isArray(b)) return validator(a, b);
 	      for (var i = 0, n = b.length; i < n; i++) if (!validator(a, b[i])) return false;
 	      return true;
 	    };
@@ -319,9 +321,9 @@
 	    /**
 	     */
 
-	    $regex: or(function(a, b) {
-	      return typeof b === 'string' && a.test(b);
-	    }),
+	    $regex: function(a, b) {
+	      return a.test(b);
+	    },
 
 	    /**
 	     */
@@ -358,20 +360,10 @@
 
 	      if (a instanceof RegExp) {
 	        return function(b) {
-	          return typeof b === 'string' && a.test(b);
+	          return a.test(comparable(b));
 	        };
 	      } else if (a instanceof Function) {
 	        return a;
-	      } else if (isArray(a) && !a.length) {
-	        // Special case of a == []
-	        return function(b) {
-	          return (isArray(b) && !b.length);
-	        };
-	      } else if (a === null){
-	        return function(b){
-	          //will match both null and undefined
-	          return b == null;
-	        }
 	      }
 
 	      return function(b) {
@@ -417,15 +409,15 @@
 	    /**
 	     */
 
-	    $regex: function(a, query) {
-	      return new RegExp(a, query.$options);
+	    $regex: function(a) {
+	      return new RegExp(a);
 	    },
 
 	    /**
 	     */
 
 	    $where: function(a) {
-	      return typeof a === 'string' ? new Function('obj', 'return ' + a) : a;
+	      return typeof a === "string" ? new Function("obj", "return " + a) : a;
 	    },
 
 	    /**
@@ -509,10 +501,11 @@
 	   */
 
 	  function parse(query) {
+
 	    query = comparable(query);
 
-	    if (!query || (query.constructor.toString() !== 'Object' &&
-	        query.constructor.toString().replace(/\n/g,'').replace(/ /g, '') !== 'functionObject(){[nativecode]}')) { // cross browser support
+	    if (!query || (query.constructor.toString() !== "Object" &&
+	        query.constructor.toString().replace(/\n/g,'').replace(/ /g, '') !== "functionObject(){[nativecode]}")) { // cross browser support
 	      query = { $eq: query };
 	    }
 
@@ -521,16 +514,15 @@
 	    for (var key in query) {
 	      var a = query[key];
 
-	      if (key === '$options') continue;
 
 	      if (operator[key]) {
-	        if (prepare[key]) a = prepare[key](a, query);
+	        if (prepare[key]) a = prepare[key](a);
 	        validators.push(createValidator(comparable(a), operator[key]));
 	      } else {
 	        if (key.charCodeAt(0) === 36) {
-	          throw new Error('Unknown operation ' + key);
+	          throw new Error("Unknown operation " + key);
 	        }
-	        validators.push(createNestedValidator(key.split('.'), parse(a)));
+	        validators.push(createNestedValidator(key.split("."), parse(a)));
 	      }
 	    }
 
@@ -594,11 +586,9 @@
 	  };
 
 	  /* istanbul ignore next */
-	  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+	  if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 	    module.exports = sift;
-	  }
-
-	  if (typeof window !== 'undefined') {
+	  } else if (typeof window !== "undefined") {
 	    window.sift = sift;
 	  }
 	})();
@@ -644,7 +634,7 @@
 	/******/ 	__webpack_require__.c = installedModules;
 
 	/******/ 	// __webpack_public_path__
-	/******/ 	__webpack_require__.p = "";
+	/******/ 	__webpack_require__.p = "/";
 
 	/******/ 	// Load entry module and return exports
 	/******/ 	return __webpack_require__(0);
@@ -654,10 +644,18 @@
 	/* 0 */
 	/***/ function(module, exports, __webpack_require__) {
 
-		var sift = __webpack_require__(1)
+		__webpack_require__(1);
+		module.exports = __webpack_require__(3);
 
 
-		module.exports = function(tableName){
+	/***/ },
+	/* 1 */
+	/***/ function(module, exports, __webpack_require__) {
+
+		var sift = __webpack_require__(2)
+
+		module.exports = window.localDB
+		window.localDB = function(tableName){
 		  var getTable = function(name){
 		    var data;
 		    if(!localStorage[name]) localStorage[name] = '[]'
@@ -671,11 +669,14 @@
 		    }
 		    return data
 		  }
+		  getTable(tableName)
 		  var self = this
-		  this.update = function(item,query){
+		  this.update = function(query,item){
 		    var Table = getTable(tableName)
-		    sift(query,Table).forEach(function(e){
-		      e = item
+		    sift(query,Table).forEach(function(el){
+		      var ElementIndex = Table.indexOf(el)
+		      item.id = el.id
+		      Table[ElementIndex] = item
 		    })
 		    localStorage[tableName] = JSON.stringify(Table)
 		  }
@@ -690,8 +691,9 @@
 		  }
 		  this.remove = function(query){
 		    var Table = getTable(tableName)
-		    sift(query,Table).forEach(function(e){
-		      delete e
+		    sift(query,Table).forEach(function(el){
+		      var ElementIndex = Table.indexOf(el)
+		      Table.splice(ElementIndex,1)
 		    })
 		    localStorage[tableName] = JSON.stringify(Table)
 		  }
@@ -713,7 +715,7 @@
 
 
 	/***/ },
-	/* 1 */
+	/* 2 */
 	/***/ function(module, exports) {
 
 		/*
@@ -1201,6 +1203,607 @@
 		  }
 		})();
 
+
+	/***/ },
+	/* 3 */
+	/***/ function(module, exports) {
+
+		/******/ (function(modules) { // webpackBootstrap
+		/******/ 	// The module cache
+		/******/ 	var installedModules = {};
+
+		/******/ 	// The require function
+		/******/ 	function __webpack_require__(moduleId) {
+
+		/******/ 		// Check if module is in cache
+		/******/ 		if(installedModules[moduleId])
+		/******/ 			return installedModules[moduleId].exports;
+
+		/******/ 		// Create a new module (and put it into the cache)
+		/******/ 		var module = installedModules[moduleId] = {
+		/******/ 			exports: {},
+		/******/ 			id: moduleId,
+		/******/ 			loaded: false
+		/******/ 		};
+
+		/******/ 		// Execute the module function
+		/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+		/******/ 		// Flag the module as loaded
+		/******/ 		module.loaded = true;
+
+		/******/ 		// Return the exports of the module
+		/******/ 		return module.exports;
+		/******/ 	}
+
+
+		/******/ 	// expose the modules object (__webpack_modules__)
+		/******/ 	__webpack_require__.m = modules;
+
+		/******/ 	// expose the module cache
+		/******/ 	__webpack_require__.c = installedModules;
+
+		/******/ 	// __webpack_public_path__
+		/******/ 	__webpack_require__.p = "";
+
+		/******/ 	// Load entry module and return exports
+		/******/ 	return __webpack_require__(0);
+		/******/ })
+		/************************************************************************/
+		/******/ ([
+		/* 0 */
+		/***/ function(module, exports, __webpack_require__) {
+
+			var sift = __webpack_require__(1)
+
+
+			module.exports = function(tableName){
+			  var getTable = function(name){
+			    var data;
+			    if(!localStorage[name]) localStorage[name] = '[]'
+			    try{
+			      data = JSON.parse(localStorage[name])
+			    }
+			    catch(e){
+			      console.info('Table ',name,' is broken creating new. All data is lost')
+			      localStorage[name] = '[]'
+			      data = []
+			    }
+			    return data
+			  }
+			  var self = this
+			  this.update = function(item,query){
+			    var Table = getTable(tableName)
+			    sift(query,Table).forEach(function(e){
+			      e = item
+			    })
+			    localStorage[tableName] = JSON.stringify(Table)
+			  }
+			  this.insert = function(object){
+			    if(object.id) self.update({id:object.id},object)
+			    else{
+			      var Table = getTable(tableName)
+			      object.id = guid()
+			      Table.push(object)
+			      localStorage[tableName] = JSON.stringify(Table)
+			    }
+			  }
+			  this.remove = function(query){
+			    var Table = getTable(tableName)
+			    sift(query,Table).forEach(function(e){
+			      delete e
+			    })
+			    localStorage[tableName] = JSON.stringify(Table)
+			  }
+			  this.query = function(q){
+			    return sift(q,JSON.parse(localStorage[tableName]))
+			  }
+
+			}
+
+			function guid() {
+			  function s4() {
+			    return Math.floor((1 + Math.random()) * 0x10000)
+			      .toString(16)
+			      .substring(1);
+			  }
+			  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+			    s4() + '-' + s4() + s4() + s4();
+			}
+
+
+		/***/ },
+		/* 1 */
+		/***/ function(module, exports) {
+
+			/*
+			 * Sift 2.x
+			 *
+			 * Copryright 2015, Craig Condon
+			 * Licensed under MIT
+			 *
+			 * Filter JavaScript objects with mongodb queries
+			 */
+
+			(function() {
+
+			  'use strict';
+
+			  /**
+			   */
+
+			  function isFunction(value) {
+			    return typeof value === 'function';
+			  }
+
+			  /**
+			   */
+
+			  function isArray(value) {
+			    return Object.prototype.toString.call(value) === '[object Array]';
+			  }
+
+			  /**
+			   */
+
+			  function comparable(value) {
+			    if (value instanceof Date) {
+			      return value.getTime();
+			    } else if (value instanceof Array) {
+			      return value.map(comparable);
+			    } else {
+			      return value;
+			    }
+			  }
+
+			  /**
+			   */
+
+			  function or(validator) {
+			    return function(a, b) {
+			      if (!isArray(b) || !b.length) return validator(a, b);
+			      for (var i = 0, n = b.length; i < n; i++) if (validator(a, b[i])) return true;
+			      return false;
+			    }
+			  }
+
+			  /**
+			   */
+
+			  function and(validator) {
+			    return function(a, b) {
+			      if (!isArray(b) || !b.length) return validator(a, b);
+			      for (var i = 0, n = b.length; i < n; i++) if (!validator(a, b[i])) return false;
+			      return true;
+			    };
+			  }
+
+			  function validate(validator, b) {
+			    return validator.v(validator.a, b);
+			  }
+
+
+			  var operator = {
+
+			    /**
+			     */
+
+			    $eq: or(function(a, b) {
+			      return a(b);
+			    }),
+
+			    /**
+			     */
+
+			    $ne: and(function(a, b) {
+			      return !a(b);
+			    }),
+
+			    /**
+			     */
+
+			    $or: function(a, b) {
+			      for (var i = 0, n = a.length; i < n; i++) if (validate(a[i], b)) return true;
+			      return false;
+			    },
+
+			    /**
+			     */
+
+			    $gt: or(function(a, b) {
+			      return typeof comparable(b) === typeof a && comparable(b) > a;
+			    }),
+
+			    /**
+			     */
+
+			    $gte: or(function(a, b) {
+			      return typeof comparable(b) === typeof a && comparable(b) >= a;
+			    }),
+
+			    /**
+			     */
+
+			    $lt: or(function(a, b) {
+			      return typeof comparable(b) === typeof a && comparable(b) < a;
+			    }),
+
+			    /**
+			     */
+
+			    $lte: or(function(a, b) {
+			      return typeof comparable(b) === typeof a && comparable(b) <= a;
+			    }),
+
+			    /**
+			     */
+
+			    $mod: or(function(a, b) {
+			      return b % a[0] == a[1];
+			    }),
+
+			    /**
+			     */
+
+			    $in: function(a, b) {
+
+			      if (b instanceof Array) {
+			        for (var i = b.length; i--;) {
+			          if (~a.indexOf(comparable(b[i]))) return true;
+			        }
+			      } else {
+			        return !!~a.indexOf(comparable(b));
+			      }
+
+			      return false;
+			    },
+
+			    /**
+			     */
+
+			    $nin: function(a, b) {
+			      return !operator.$in(a, b);
+			    },
+
+			    /**
+			     */
+
+			    $not: function(a, b) {
+			      return !validate(a, b);
+			    },
+
+			    /**
+			     */
+
+			    $type: function(a, b) {
+			      return b != void 0 ? b instanceof a || b.constructor == a : false;
+			     },
+
+			    /**
+			     */
+
+			    $all: function(a, b) {
+			      if (!b) b = [];
+			      for (var i = a.length; i--;) {
+			        if (!~comparable(b).indexOf(a[i])) return false;
+			      }
+			      return true;
+			    },
+
+			    /**
+			     */
+
+			    $size: function(a, b) {
+			      return b ? a === b.length : false;
+			    },
+
+			    /**
+			     */
+
+			    $nor: function(a, b) {
+			      // todo - this suffice? return !operator.$in(a)
+			      for (var i = 0, n = a.length; i < n; i++) if (validate(a[i], b)) return false;
+			      return true;
+			    },
+
+			    /**
+			     */
+
+			    $and: function(a, b) {
+			      for (var i = 0, n = a.length; i < n; i++) if (!validate(a[i], b)) return false;
+			      return true;
+			    },
+
+			    /**
+			     */
+
+			    $regex: or(function(a, b) {
+			      return typeof b === 'string' && a.test(b);
+			    }),
+
+			    /**
+			     */
+
+			    $where: function(a, b) {
+			      return a.call(b, b);
+			    },
+
+			    /**
+			     */
+
+			    $elemMatch: function(a, b) {
+			      if (isArray(b)) return !!~search(b, a);
+			      return validate(a, b);
+			    },
+
+			    /**
+			     */
+
+			    $exists: function(a, b) {
+			      return (b != void 0) === a;
+			    }
+			  };
+
+			  /**
+			   */
+
+			  var prepare = {
+
+			    /**
+			     */
+
+			    $eq: function(a) {
+
+			      if (a instanceof RegExp) {
+			        return function(b) {
+			          return typeof b === 'string' && a.test(b);
+			        };
+			      } else if (a instanceof Function) {
+			        return a;
+			      } else if (isArray(a) && !a.length) {
+			        // Special case of a == []
+			        return function(b) {
+			          return (isArray(b) && !b.length);
+			        };
+			      } else if (a === null){
+			        return function(b){
+			          //will match both null and undefined
+			          return b == null;
+			        }
+			      }
+
+			      return function(b) {
+			        return a === comparable(b);
+			      };
+			    },
+
+			    /**
+			     */
+
+			    $ne: function(a) {
+			      return prepare.$eq(a);
+			    },
+
+			    /**
+			     */
+
+			    $and: function(a) {
+			      return a.map(parse);
+			    },
+
+			    /**
+			     */
+
+			    $or: function(a) {
+			      return a.map(parse);
+			    },
+
+			    /**
+			     */
+
+			    $nor: function(a) {
+			      return a.map(parse);
+			    },
+
+			    /**
+			     */
+
+			    $not: function(a) {
+			      return parse(a);
+			    },
+
+			    /**
+			     */
+
+			    $regex: function(a, query) {
+			      return new RegExp(a, query.$options);
+			    },
+
+			    /**
+			     */
+
+			    $where: function(a) {
+			      return typeof a === 'string' ? new Function('obj', 'return ' + a) : a;
+			    },
+
+			    /**
+			     */
+
+			    $elemMatch: function(a) {
+			      return parse(a);
+			    },
+
+			    /**
+			     */
+
+			    $exists: function(a) {
+			      return !!a;
+			    }
+			  };
+
+			  /**
+			   */
+
+			  function search(array, validator) {
+
+			    for (var i = 0; i < array.length; i++) {
+			      if (validate(validator, array[i])) {
+			        return i;
+			      }
+			    }
+
+			    return -1;
+			  }
+
+			  /**
+			   */
+
+			  function createValidator(a, validate) {
+			    return { a: a, v: validate };
+			  }
+
+			  /**
+			   */
+
+			  function nestedValidator(a, b) {
+			    var values  = [];
+			    findValues(b, a.k, 0, values);
+
+			    if (values.length === 1) {
+			      return validate(a.nv, values[0]);
+			    }
+
+			    return !!~search(values, a.nv);
+			  }
+
+			  /**
+			   */
+
+			  function findValues(current, keypath, index, values) {
+
+			    if (index === keypath.length || current == void 0) {
+			      values.push(current);
+			      return;
+			    }
+
+			    if (isArray(current)) {
+			      for (var i = 0, n = current.length; i < n; i++) {
+			        findValues(current[i], keypath, index, values);
+			      }
+			    } else {
+			      findValues(current[keypath[index]], keypath, index + 1, values);
+			    }
+			  }
+
+			  /**
+			   */
+
+			  function createNestedValidator(keypath, a) {
+			    return { a: { k: keypath, nv: a }, v: nestedValidator };
+			  }
+
+			  /**
+			   * flatten the query
+			   */
+
+			  function parse(query) {
+			    query = comparable(query);
+
+			    if (!query || (query.constructor.toString() !== 'Object' &&
+			        query.constructor.toString().replace(/\n/g,'').replace(/ /g, '') !== 'functionObject(){[nativecode]}')) { // cross browser support
+			      query = { $eq: query };
+			    }
+
+			    var validators = [];
+
+			    for (var key in query) {
+			      var a = query[key];
+
+			      if (key === '$options') continue;
+
+			      if (operator[key]) {
+			        if (prepare[key]) a = prepare[key](a, query);
+			        validators.push(createValidator(comparable(a), operator[key]));
+			      } else {
+			        if (key.charCodeAt(0) === 36) {
+			          throw new Error('Unknown operation ' + key);
+			        }
+			        validators.push(createNestedValidator(key.split('.'), parse(a)));
+			      }
+			    }
+
+			    return validators.length === 1 ? validators[0] : createValidator(validators, operator.$and);
+			  }
+
+			  /**
+			   */
+
+			  function createRootValidator(query, getter) {
+			    var validator = parse(query);
+			    if (getter) {
+			      validator = {
+			        a: validator,
+			        v: function(a, b) {
+			          return validate(a, getter(b));
+			        }
+			      };
+			    }
+			    return validator;
+			  }
+
+			  /**
+			   */
+
+			  function sift(query, array, getter) {
+
+			    if (isFunction(array)) {
+			      getter = array;
+			      array  = void 0;
+			    }
+
+			    var validator = createRootValidator(query, getter);
+
+			    function filter(b) {
+			      return validate(validator, b);
+			    }
+
+			    if (array) {
+			      return array.filter(filter);
+			    }
+
+			    return filter;
+			  }
+
+			  /**
+			   */
+
+			  sift.use = function(plugin) {
+			    if (isFunction(plugin)) return plugin(sift);
+			    for (var key in plugin) {
+			      if (key.charCodeAt(0) === 36) operator[key] = plugin[key];
+			    }
+			  };
+
+			  /**
+			   */
+
+			  sift.indexOf = function(query, array, getter) {
+			    return search(array, createRootValidator(query, getter));
+			  };
+
+			  /* istanbul ignore next */
+			  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+			    module.exports = sift;
+			  }
+
+			  if (typeof window !== 'undefined') {
+			    window.sift = sift;
+			  }
+			})();
+
+
+		/***/ }
+		/******/ ]);
 
 	/***/ }
 	/******/ ]);

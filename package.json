@@ -1,22 +1,22 @@
 {
-  "name": "local-db",
-  "version": "1.0.0",
-  "description": "Local database using  browser localStorage api",
-  "homepage": "https://github.com/kucukkanat/LocalDB#readme",
-  "bugs": {
-    "url": "https://github.com/kucukkanat/LocalDB/issues"
-  },
-  "license": "ISC",
-  "author": "htolgasahin@gmail.com",
-  "main": "localDB.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kucukkanat/LocalDB.git"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "sift": "git+https://github.com/kucukkanat/sift.js.git"
-  }
+	"name": "local-db",
+	"version": "1.0.0",
+	"description": "Local database using  browser localStorage api",
+	"homepage": "https://github.com/kucukkanat/LocalDB#readme",
+	"bugs": {
+		"url": "https://github.com/kucukkanat/LocalDB/issues"
+	},
+	"license": "ISC",
+	"author": "htolgasahin@gmail.com",
+	"main": "localDB.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kucukkanat/LocalDB.git"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"dependencies": {
+		"sift": "git+https://github.com/kucukkanat/sift.js.git"
+	}
 }
