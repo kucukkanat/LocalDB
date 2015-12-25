@@ -1,76 +1,54 @@
 var sift = require('sift')
 
-if(!window) console.error('This plugin only works in browsers! Not meant for node environment!')
-module.exports = window.LocalDB
-window.LocalDB = {
-  tables : [],
-  create : function(name){
-    if(localStorage[name]){
-        FixIfBroken(name)
-        console.warn('Table ',name,' already exists!')
-    }
-    else{
-      localStorage[name] = '[]'
-      LocalDB.tables.push(name)
-      console.log('Table ',name,' created!')
-    }
-  },
-  table : function(name,showTableInConsole){
+module.exports = window.localDB
+window.localDB = function(tableName){
+  var getTable = function(name){
+    var data;
+    if(!localStorage[name]) localStorage[name] = '[]'
     try{
-      if(showTableInConsole) console.table(JSON.parse(localStorage[name]))
-      return JSON.parse(localStorage[name])
-    }catch(e){
-      console.warn('Table ',name,' does not exist!')
-      console.warn('Create a table with : LocalDB.create("'+name+'")')
+      data = JSON.parse(localStorage[name])
     }
-
-  },
-  query : function(name,Q){
-    var Table = LocalDB.table(name)
-    try{return sift(Q,Table)}catch(e){}
-  },
-  insert  :function(TableName,Obj){
-    var Table = LocalDB.table(TableName)
-
-    if(Table){
-      if(!Obj.id){
-        Obj.id = guid()
-        Table.push(Obj)
-      }
-      else{
-        var inserted = false
-        for(var i=0;i<Table.length;i++) if(Table[i].id == Obj.id){
-          inserted = true
-          Table[i] = Obj
-        }
-        if(!inserted) Table.push(Obj)
-      }
-      localStorage[TableName] = JSON.stringify(Table)
+    catch(e){
+      console.info('Table ',name,' is broken creating new. All data is lost')
+      localStorage[name] = '[]'
+      data = []
     }
-
-  },
-  delete : function(TableName,Q){
-    var Table = LocalDB.table(TableName)
-    var e = sift(Q,Table)
-    e.forEach(function(row){
-      var index = Table.indexOf(row)
-      Table.splice(index,1)
+    return data
+  }
+  getTable(tableName)
+  var self = this
+  this.update = function(query,item){
+    var Table = getTable(tableName)
+    sift(query,Table).forEach(function(el){
+      var ElementIndex = Table.indexOf(el)
+      item.id = el.id
+      Table[ElementIndex] = item
     })
-    localStorage[TableName] = JSON.stringify(Table)
-  },
-  truncate : function(TableName){localStorage[TableName]='[]'}
+    localStorage[tableName] = JSON.stringify(Table)
+  }
+  this.insert = function(object){
+    if(object.id) self.update({id:object.id},object)
+    else{
+      var Table = getTable(tableName)
+      object.id = guid()
+      Table.push(object)
+      localStorage[tableName] = JSON.stringify(Table)
+    }
+  }
+  this.remove = function(query){
+    var Table = getTable(tableName)
+    sift(query,Table).forEach(function(el){
+      var ElementIndex = Table.indexOf(el)
+      Table.splice(ElementIndex,1)
+    })
+    localStorage[tableName] = JSON.stringify(Table)
+  }
+  this.query = function(q){
+    return sift(q,JSON.parse(localStorage[tableName]))
+  }
+
 }
 
-
-var FixIfBroken = function(name){
-  try{
-    JSON.parse(localStorage[name])
-  }
-  catch(e){
-    console.warn('The table is broken, fixing and truncating now')
-    localStorage[name] = '[]'
-  }
-}
 function guid() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)

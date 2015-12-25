@@ -3,28 +3,28 @@ This is a simple wrapper for javascript's localStorage API for a more convenient
 
 LocalDB.js requires [sift](http://github.com/kucukkanat/sift.js)
 
-First create a database :
+First create a database engine:
 ```
-  var UserDB = LocalDB.create('users')
+  var DB = require('local-db')
 ```
-Get the whole table :
+Create a table :
 ```
-  var AllUsers = LocalDB.table('users')
+  var users = new DB('users')
 ```
 You can query your table using MongoDB queries
 ```
-LocalDB.query( 'users', {age:{$gt:18}} )
+var majors = users.query({age:{$gt:18}})
 ```
 To insert the object to a table simply send the object itself
 ```
-LocalDB.insert('users',{username:'kucukkanat',password:123})
+users.insert({username:'kucukkanat',password:123})
 ```
 To delete rows from table use queries
 ```
-LocalDB.delete('users',{id:182736})
+users.remove({id:182736})
 ```
 
 ###TO-DO
-* Make update function
+* ~~Make update function~~
 * ~~Make npm package~~
 * ~~Pack sift with `webpack`~~
