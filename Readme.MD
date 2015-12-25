@@ -24,6 +24,17 @@ To delete rows from table use queries
 users.remove({id:182736})
 ```
 
+## For those who don't use webpack
+
+You can  :
+
+    <script src="index.js"></script>
+
+Then :
+
+var users = new 
+
+
 ###TO-DO
 * ~~Make update function~~
 * ~~Make npm package~~

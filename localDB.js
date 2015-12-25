@@ -49,7 +49,7 @@ var LocalDB = function(tableName){
 }
 
 module.exports = LocalDB
-if(window) window.LocalDB = LocalDB
+if(window) window.DB = LocalDB
 
 function guid() {
   function s4() {
