@@ -43,6 +43,9 @@ var LocalDB = function(tableName){
     localStorage[tableName] = JSON.stringify(Table)
   }
   this.query = function(q){
+    if(typeof q !== 'object') {
+      q = {};
+    }
     return sift(q,JSON.parse(localStorage[tableName]))
   }
 
