@@ -4,23 +4,23 @@ This is a simple wrapper for javascript's localStorage API for a more convenient
 LocalDB.js requires [sift](http://github.com/kucukkanat/sift.js)
 
 First create a database engine:
-```
+```js
   var DB = require('local-db')
 ```
 Create a table :
-```
+```js
   var users = new DB('users')
 ```
 You can query your table using MongoDB queries
-```
+```js
 var majors = users.query({age:{$gt:18}})
 ```
 To insert the object to a table simply send the object itself
-```
+```js
 users.insert({username:'kucukkanat',password:123})
 ```
 To delete rows from table use queries
-```
+```js
 users.remove({id:182736})
 ```
 
