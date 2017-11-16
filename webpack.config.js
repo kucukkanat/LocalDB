@@ -1,10 +1,11 @@
 var path = require("path");
 module.exports = {
   entry: {
-    app: ["./localDB.js"]
+    app: ["./src/index.js"]
   },
   output: {
-    publicPath: "/",
+    path: path.resolve(__dirname, "dist"),
+    publicPath: "/dist",
     filename: "index.js"
   }
 };

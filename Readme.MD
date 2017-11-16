@@ -28,7 +28,7 @@ users.remove({id:182736})
 
 You can  :
 
-    <script src="index.js"></script>
+    <script src="dist/index.js"></script>
 
 Then :
 

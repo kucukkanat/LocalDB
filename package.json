@@ -14,9 +14,11 @@
 		"url": "git+https://github.com/kucukkanat/LocalDB.git"
 	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "webpack"
 	},
-	"dependencies": {
-		"sift": "git+https://github.com/kucukkanat/sift.js.git"
+	"devDependencies": {
+        "sift": "^5.0.0",
+		"webpack": "^3.8.1"
 	}
 }
