@@ -7,10 +7,11 @@ export default class LocalDB {
     // Create table in localstorage if doesnt exist
     if (!localStorage[tableName]) localStorage[tableName] = '[]'
     try {
-      data = JSON.parse(localStorage[name])
+      const data = JSON.parse(localStorage[this.name])
     } catch (e) {
-      this.debug ? console.info(`Table ${tableName} is broken creating new. All data is lost`) : null
-      localStorage[tableName] = '[]'
+      console.log(e)
+      this.debug ? console.info(`Table ${this.name} is broken creating new. All data is lost`) : null
+      localStorage[this.name] = '[]'
     }
 
     this.getTable = this.getTable.bind(this)
@@ -35,22 +36,21 @@ export default class LocalDB {
 
   }
   insert(object) {
-    const dbObject = this.query({
-      id: object.id
-    })
-    
-    if (dbObject.length) {
+    if(object.id) {
       this.update({
         id: object.id
       }, object)
       // ok we did what we came for, go home
       return object;
+    } else{
+      object.id = guid()
     }
-
+    
 
     let table = JSON.parse(localStorage[this.name])
     table.push(object)
     localStorage[this.name] = JSON.stringify(table)
+    console.table(table)
     return object
   }
   update(queryObj,objectToMerge) {
