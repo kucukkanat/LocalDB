@@ -7,7 +7,7 @@ module.exports = function (done) {
         .pipe(webserver({
             port: PORT,
             livereload: true,
-            directoryListing: true,
+            directoryListing: false,
             open: false
         }))
 }
