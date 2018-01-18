@@ -1,5 +1,3 @@
-import LocalDB from './../dist/release'
-
 window.users = new LocalDB('users',true)
 
 var kucukkanat = users.insert({username:'kucukkanat',age:28})

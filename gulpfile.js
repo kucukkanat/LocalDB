@@ -30,9 +30,5 @@ gulp.task('build:example', (done) => {
 
 gulp.task('dev', gulp.parallel('webserver', 'build', function watch() {
   gulp.watch('src/**/*.js', gulp.parallel('build'))
-}))
-
-gulp.task('dev:example', gulp.parallel('webserver', 'build:example', function watch() {
-  gulp.watch('src/**/*.js', gulp.parallel('build'))
-  gulp.watch('example/index.js', gulp.parallel('build:example'))
+  gulp.watch('example/index.js', gulp.parallel('build'))
 }))

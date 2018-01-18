@@ -5,11 +5,10 @@ module.exports = function () {
     return gulp.src('src/index.js')
         .pipe(webpack({
             entry: {
-                release: ["./src/index.js"]
+                release: ["./src/index.js"],
+                example: ["./example/index.js"]
             },
             output: {
-                path: path.resolve(__dirname, "dist"),
-                publicPath: "/dist",
                 filename: "[name].js",
                 library: 'localdb',
                 libraryTarget: 'umd'
@@ -24,4 +23,5 @@ module.exports = function () {
             devtool: 'source-map'
         }))
         .pipe(gulp.dest('dist/'))
+        .pipe(gulp.dest('example/dist/'))
 }
