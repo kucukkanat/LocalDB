@@ -17,6 +17,10 @@ export default class LocalDB {
     this.remove = this.remove.bind(this)
     this.insert = this.insert.bind(this)
     this.update = this.update.bind(this)
+
+    this.on = this.on.bind(this)
+    this.emit = this.emit.bind(this)
+    this.eventListeners = []
     // Aliases
     this.create = this.insert
     this.read = this.query
@@ -46,6 +50,8 @@ export default class LocalDB {
     let table = JSON.parse(localStorage[this.name])
     table.push(object)
     localStorage[this.name] = JSON.stringify(table)
+    this.emit('$insert',object)
+    this.emit('$create',object)
     return object
   }
   query(queryObj = {}) {
@@ -63,16 +69,34 @@ export default class LocalDB {
   }
   remove(queryObj) {
     let table = this.getTable()
-    sift({$not:queryObj},table)
+    sift(queryObj,table)
     .forEach((row)=>{
       const index = table.indexOf(row)
       table.splice(index,1)
       localStorage[this.name] = JSON.stringify(table)
+      this.emit('$remove',row)
+      this.emit('$delete',row)
     })
+    
   }
   
   drop() {
     localStorage[this.name] = '[]'
+    this.emit('$drop')
+    
+  }
+
+  on(name, fn) {
+    this.eventListeners.push({
+      name,
+      fn
+    })
+  }
+  emit(name, payload) {
+    sift({name:name},this.eventListeners)
+    .forEach((eventListener) => {
+      eventListener.fn(payload)
+    })
   }
 }
 
