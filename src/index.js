@@ -17,6 +17,10 @@ export default class LocalDB {
     this.remove = this.remove.bind(this)
     this.insert = this.insert.bind(this)
     this.update = this.update.bind(this)
+    // Aliases
+    this.create = this.insert
+    this.read = this.query
+    this.delete = this.remove
   }
   getTable() {
     try {
@@ -25,13 +29,8 @@ export default class LocalDB {
     } catch (e) {
       return null
     }
-  }
-  query(queryObj = {}) {
-    return sift(queryObj, JSON.parse(localStorage[this.name]))
-  }
-  remove() {
-
-  }
+  }  
+  
   insert(object) {
     if(object.id) {
       this.update({
@@ -49,6 +48,9 @@ export default class LocalDB {
     localStorage[this.name] = JSON.stringify(table)
     return object
   }
+  query(queryObj = {}) {
+    return sift(queryObj, JSON.parse(localStorage[this.name]))
+  }
   update(queryObj,objectToMerge) {
     let table = this.getTable()
     const updatedTable = sift(queryObj,table)
@@ -59,6 +61,16 @@ export default class LocalDB {
     
     localStorage[this.name] = JSON.stringify(table)
   }
+  remove(queryObj) {
+    let table = this.getTable()
+    sift({$not:queryObj},table)
+    .forEach((row)=>{
+      const index = table.indexOf(row)
+      table.splice(index,1)
+      localStorage[this.name] = JSON.stringify(table)
+    })
+  }
+  
   drop() {
     localStorage[this.name] = '[]'
   }
