@@ -11,10 +11,17 @@ module.exports = function () {
                 path: path.resolve(__dirname, "dist"),
                 publicPath: "/dist",
                 filename: "[name].js",
-                library:'localdb',
-                libraryTarget:'umd'
+                library: 'localdb',
+                libraryTarget: 'umd'
             },
-            devtool:'source-map'
+            module: {
+                rules: [{
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    loader: "babel-loader"
+                }]
+            },
+            devtool: 'source-map'
         }))
         .pipe(gulp.dest('dist/'))
 }
