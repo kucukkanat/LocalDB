@@ -1,71 +1,73 @@
-var sift = require('sift')
-
-var LocalDB = function(tableName){
-  var getTable = function(name){
-    var data;
-    if(!localStorage[name]) localStorage[name] = '[]'
-    try{
+import sift from 'sift'
+import _ from 'lodash'
+export default class LocalDB {
+  constructor(tableName,debug) {
+    this.name = tableName
+    this.debug = debug
+    // Create table in localstorage if doesnt exist
+    if (!localStorage[tableName]) localStorage[tableName] = '[]'
+    try {
       data = JSON.parse(localStorage[name])
+    } catch (e) {
+      this.debug ? console.info(`Table ${tableName} is broken creating new. All data is lost`) : null
+      localStorage[tableName] = '[]'
     }
-    catch(e){
-      console.info('Table ',name,' is broken creating new. All data is lost')
-      localStorage[name] = '[]'
-      data = []
-    }
-    return data
+
+    this.getTable = this.getTable.bind(this)
+    this.query = this.query.bind(this)
+    this.remove = this.remove.bind(this)
+    this.insert = this.insert.bind(this)
+    this.update = this.update.bind(this)
   }
-  getTable(tableName)
-  var self = this;
-  this.debug = false;
-  this.update = function(query,item){
-    var Table = getTable(tableName)
-    sift(query,Table).forEach(function(el){
-      var ElementIndex = Table.indexOf(el)
-      item.id = el.id
-      Table[ElementIndex] = item
+  getTable() {
+    try {
+      const table = JSON.parse(localStorage[this.name])
+      return table
+    } catch (e) {
+      this.debug ? console.error(`The table ${this.name} is broken! : `, localStorage[this.name]) : null
+      return null
+    }
+  }
+  query(queryObj = {}) {
+    return sift(queryObj, JSON.parse(localStorage[this.name]))
+  }
+  remove() {
+
+  }
+  insert(object) {
+    const dbObject = this.query({
+      id: object.id
     })
-    localStorage[tableName] = JSON.stringify(Table)
-  }
-  this.insert = function(object){
-    if(object.id) {
-      var dbObject = self.query({
+    
+    if (dbObject.length) {
+      this.update({
         id: object.id
-      });
-      if(dbObject.length) {
-        self.update({id:object.id},object)
-        // ok we did what we came for, go home
-        return;
-      }
+      }, object)
+      // ok we did what we came for, go home
+      return object;
     }
 
-    // we either don't have object with object.id or object doesn't have id
-    var Table = getTable(tableName)
-    object.id = object.id || guid() // respect user's id
-    Table.push(object)
-    localStorage[tableName] = JSON.stringify(Table)
 
+    let table = JSON.parse(localStorage[this.name])
+    table.push(object)
+    localStorage[this.name] = JSON.stringify(table)
+    return object
   }
-  this.remove = function(query){
-    var Table = getTable(tableName)
-    sift(query,Table).forEach(function(el){
-      var ElementIndex = Table.indexOf(el)
-      Table.splice(ElementIndex,1)
+  update(queryObj,objectToMerge) {
+    let table = this.getTable()
+    const updatedTable = sift(queryObj,table)
+    .map((row)=>{
+      return _.merge(row,objectToMerge)
     })
-    localStorage[tableName] = JSON.stringify(Table)
+    console.log(table,updatedTable)
+    localStorage[this.name] = JSON.stringify(updatedTable)
   }
-  this.query = function(q){
-    if(typeof q !== 'object') {
-      q = {};
-    }
-    var result = sift(q,JSON.parse(localStorage[tableName]));
-    this.debug && console.table(result);
-    return result;
+  drop() {
+    localStorage[this.name] = '[]'
   }
-
 }
-// Export to global scope if running on the browser
-module.exports = LocalDB
-if(window) window.DB = LocalDB
+
+if (window) window.LocalDB = LocalDB
 
 function guid() {
   function s4() {
