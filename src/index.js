@@ -9,8 +9,6 @@ export default class LocalDB {
     try {
       const data = JSON.parse(localStorage[this.name])
     } catch (e) {
-      console.log(e)
-      this.debug ? console.info(`Table ${this.name} is broken creating new. All data is lost`) : null
       localStorage[this.name] = '[]'
     }
 
@@ -25,7 +23,6 @@ export default class LocalDB {
       const table = JSON.parse(localStorage[this.name])
       return table
     } catch (e) {
-      this.debug ? console.error(`The table ${this.name} is broken! : `, localStorage[this.name]) : null
       return null
     }
   }
@@ -50,17 +47,17 @@ export default class LocalDB {
     let table = JSON.parse(localStorage[this.name])
     table.push(object)
     localStorage[this.name] = JSON.stringify(table)
-    console.table(table)
     return object
   }
   update(queryObj,objectToMerge) {
     let table = this.getTable()
     const updatedTable = sift(queryObj,table)
-    .map((row)=>{
-      return _.merge(row,objectToMerge)
+    .forEach((row)=>{
+      const index = table.indexOf(row)
+      table[index] = _.merge(row,objectToMerge)
     })
-    console.log(table,updatedTable)
-    localStorage[this.name] = JSON.stringify(updatedTable)
+    
+    localStorage[this.name] = JSON.stringify(table)
   }
   drop() {
     localStorage[this.name] = '[]'

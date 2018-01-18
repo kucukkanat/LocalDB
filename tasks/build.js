@@ -5,8 +5,7 @@ module.exports = function () {
     return gulp.src('src/index.js')
         .pipe(webpack({
             entry: {
-                release: ["./src/index.js"],
-                example: ["./example/index.js"]
+                release: "./src/index.js"
             },
             output: {
                 filename: "[name].js",
@@ -23,5 +22,4 @@ module.exports = function () {
             devtool: 'source-map'
         }))
         .pipe(gulp.dest('dist/'))
-        .pipe(gulp.dest('example/dist/'))
 }
