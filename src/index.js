@@ -11,7 +11,7 @@ export default class LocalDB {
     } catch (e) {
       localStorage[this.name] = '[]'
     }
-
+    
     this.getTable = this.getTable.bind(this)
     this.query = this.query.bind(this)
     this.remove = this.remove.bind(this)
@@ -26,6 +26,7 @@ export default class LocalDB {
     this.read = this.query
     this.delete = this.remove
   }
+  
   getTable() {
     try {
       const table = JSON.parse(localStorage[this.name])

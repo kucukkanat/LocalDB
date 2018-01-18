@@ -2,7 +2,7 @@ const gulp = require('gulp')
 const webpack = require('webpack-stream')
 const path = require('path')
 module.exports = function () {
-    return gulp.src('src/index.js')
+    const task = gulp.src('src/index.js')
         .pipe(webpack({
             entry: {
                 release: "./src/index.js"
@@ -21,5 +21,10 @@ module.exports = function () {
             },
             devtool: 'source-map'
         }))
-        .pipe(gulp.dest('dist/'))
+    if(process.env.NODE_ENV === 'production') {
+        // Minify here
+        
+    }
+    task = task.pipe(gulp.dest('dist/'))
+    return task
 }
