@@ -17,17 +17,17 @@ or
 ```
 ## Usage
 
-```
+```javascript
 import LocalDB from 'local-db'
 ```
 or
-```
+```javascript
 var LocalDB = require('local-db)
 ```
 
 then
 
-```
+```javascript
 var usersTable = new LocalDB('users')
 ```
 
@@ -37,7 +37,7 @@ var usersTable = new LocalDB('users')
 If object has an `.id` property, LocalDB will try to update the object in the table with 
 regarding id.
 
-```
+```javascript
 usersTable.insert({username:'kucukkanat',city:'Izmir'})
 ```
 **returns :** the user object created in table with generated ID
@@ -45,7 +45,7 @@ usersTable.insert({username:'kucukkanat',city:'Izmir'})
 ### .read(query)
 Returns an array of the elements matching the query
 
-```
+```javascript
 // Guys you are not allowed to buy cigarettes!
 usersTable.query({age:{$lt:{18}}})
 ```
@@ -55,7 +55,7 @@ usersTable.query({age:{$lt:{18}}})
 Updates all objects in table matching the query. The update method does a deep merge 
 using `lodash` 's  `_.merge` method. [_.merge](https://lodash.com/docs/4.17.4#merge)
 
-```
+```javascript
 // Moves kucukkanat from Izmir to Amsterdam
 usersTable.update({username:'kucukkanat'},{city:'Amsterdam'})
 ```
@@ -64,7 +64,7 @@ usersTable.update({username:'kucukkanat'},{city:'Amsterdam'})
 ### .delete(query)
 Deletes all objects in table matching the query
 
-```
+```javascript
 // Are you not a bit old for skating grandpa ?
 usersTable.delete({age:{$gt:70}})
 ```
@@ -73,7 +73,7 @@ usersTable.delete({age:{$gt:70}})
 ### .drop()
 Empties the table
 
-```
+```javascript
 usersTable.drop()
 ```
 **returns :** LocalDB instance itself
@@ -82,7 +82,7 @@ usersTable.drop()
 ### .on(eventName,fn)
 Listens for events : `insert` , `create` , `update` , `remove` , `delete` , `drop`
 
-```
+```javascript
 users.on('$insert',(object)=>{
     // console.log(object, ' inserted!')
 })
