@@ -69,6 +69,7 @@ export default class LocalDB {
     })
     
     localStorage[this.name] = JSON.stringify(table)
+    return this
   }
   remove(queryObj) {
     let table = this.getTable()
@@ -80,13 +81,13 @@ export default class LocalDB {
       this.emit('$remove',row)
       this.emit('$delete',row)
     })
-    
+    return this
   }
   
   drop() {
     localStorage[this.name] = '[]'
     this.emit('$drop')
-    
+    return this
   }
 
   on(name, fn) {
@@ -103,7 +104,21 @@ export default class LocalDB {
   }
 }
 
-if (window) window.LocalDB = LocalDB
+/* istanbul ignore next */
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  module.exports = LocalDB;
+  exports['default'] = module.exports.default = LocalDB;
+}
+
+/* istanbul ignore next */
+if (typeof window !== 'undefined') {
+  window.LocalDB = LocalDB;
+}
+
 
 function guid() {
   function s4() {

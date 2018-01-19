@@ -5,7 +5,7 @@ module.exports = function () {
     let task = gulp.src('src/index.js')
         .pipe(webpack({
             entry: {
-                release: "./src/index.js"
+                release: "./src/index.js",
             },
             output: {
                 filename: "[name].js",
