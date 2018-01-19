@@ -1,6 +1,6 @@
 {
 	"name": "local-db",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"description": "Local database using  browser localStorage api",
 	"homepage": "https://github.com/kucukkanat/LocalDB#readme",
 	"bugs": {
@@ -8,17 +8,26 @@
 	},
 	"license": "ISC",
 	"author": "htolgasahin@gmail.com",
-	"main": "localDB.js",
+	"main": "dist/release.js",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/kucukkanat/LocalDB.git"
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "webpack"
+		"gulp": "gulp",
+		"dev": "gulp dev",
+		"build": "gulp build"
 	},
 	"devDependencies": {
-        "sift": "^5.0.0",
-		"webpack": "^3.8.1"
+		"babel-core": "^6.26.0",
+		"babel-loader": "^7.1.2",
+		"babel-preset-env": "^1.6.1",
+		"gulp": "^4.0.0",
+		"gulp-cli": "^2.0.0",
+		"gulp-webserver": "^0.9.1",
+		"lodash": "^4.17.4",
+		"webpack": "^3.8.1",
+		"webpack-stream": "^4.0.0"
 	}
 }

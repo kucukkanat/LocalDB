@@ -1,71 +1,124 @@
-var sift = require('sift')
+import sift from './sift'
+import _ from 'lodash'
+export default class LocalDB {
+  constructor(tableName,debug) {
+    this.name = tableName
+    this.debug = debug
+    // Create table in localstorage if doesnt exist
+    if (!localStorage[tableName]) localStorage[tableName] = '[]'
+    try {
+      const data = JSON.parse(localStorage[this.name])
+    } catch (e) {
+      localStorage[this.name] = '[]'
+    }
+    
+    this.getTable = this.getTable.bind(this)
+    this.query = this.query.bind(this)
+    this.remove = this.remove.bind(this)
+    this.insert = this.insert.bind(this)
+    this.update = this.update.bind(this)
 
-var LocalDB = function(tableName){
-  var getTable = function(name){
-    var data;
-    if(!localStorage[name]) localStorage[name] = '[]'
-    try{
-      data = JSON.parse(localStorage[name])
-    }
-    catch(e){
-      console.info('Table ',name,' is broken creating new. All data is lost')
-      localStorage[name] = '[]'
-      data = []
-    }
-    return data
+    this.on = this.on.bind(this)
+    this.emit = this.emit.bind(this)
+    this.eventListeners = []
+    // Aliases
+    this.create = this.insert
+    this.read = this.query
+    this.delete = this.remove
   }
-  getTable(tableName)
-  var self = this;
-  this.debug = false;
-  this.update = function(query,item){
-    var Table = getTable(tableName)
-    sift(query,Table).forEach(function(el){
-      var ElementIndex = Table.indexOf(el)
-      item.id = el.id
-      Table[ElementIndex] = item
-    })
-    localStorage[tableName] = JSON.stringify(Table)
-  }
-  this.insert = function(object){
+  
+  getTable() {
+    try {
+      const table = JSON.parse(localStorage[this.name])
+      return table
+    } catch (e) {
+      return null
+    }
+  }  
+  
+  insert(object) {
     if(object.id) {
-      var dbObject = self.query({
+      this.update({
         id: object.id
-      });
-      if(dbObject.length) {
-        self.update({id:object.id},object)
-        // ok we did what we came for, go home
-        return;
-      }
+      }, object)
+      // ok we did what we came for, go home
+      return object;
+    } else{
+      object.id = guid()
     }
+    
 
-    // we either don't have object with object.id or object doesn't have id
-    var Table = getTable(tableName)
-    object.id = object.id || guid() // respect user's id
-    Table.push(object)
-    localStorage[tableName] = JSON.stringify(Table)
-
+    let table = JSON.parse(localStorage[this.name])
+    table.push(object)
+    localStorage[this.name] = JSON.stringify(table)
+    this.emit('$insert',object)
+    this.emit('$create',object)
+    return object
   }
-  this.remove = function(query){
-    var Table = getTable(tableName)
-    sift(query,Table).forEach(function(el){
-      var ElementIndex = Table.indexOf(el)
-      Table.splice(ElementIndex,1)
+  query(queryObj = {}) {
+    return sift(queryObj, JSON.parse(localStorage[this.name]))
+  }
+  update(queryObj,objectToMerge) {
+    let table = this.getTable()
+    const updatedTable = sift(queryObj,table)
+    .forEach((row)=>{
+      const index = table.indexOf(row)
+      const nextObject = _.merge({},row,objectToMerge)
+      this.emit('$update',row,nextObject)
+      table[index] = nextObject
     })
-    localStorage[tableName] = JSON.stringify(Table)
+    
+    localStorage[this.name] = JSON.stringify(table)
+    return this
   }
-  this.query = function(q){
-    if(typeof q !== 'object') {
-      q = {};
-    }
-    var result = sift(q,JSON.parse(localStorage[tableName]));
-    this.debug && console.table(result);
-    return result;
+  remove(queryObj) {
+    let table = this.getTable()
+    sift(queryObj,table)
+    .forEach((row)=>{
+      const index = table.indexOf(row)
+      table.splice(index,1)
+      localStorage[this.name] = JSON.stringify(table)
+      this.emit('$remove',row)
+      this.emit('$delete',row)
+    })
+    return this
+  }
+  
+  drop() {
+    localStorage[this.name] = '[]'
+    this.emit('$drop')
+    return this
   }
 
+  on(name, fn) {
+    this.eventListeners.push({
+      name,
+      fn
+    })
+  }
+  emit(name, ...payload) {
+    sift({name:name},this.eventListeners)
+    .forEach((eventListener) => {
+      eventListener.fn.apply(this.getTable(),payload)
+    })
+  }
 }
-// Export to global scope if running on the browser
-module.exports = LocalDB
-if(window) window.DB = LocalDB
+
+/* istanbul ignore next */
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  module.exports = LocalDB;
+  exports['default'] = module.exports.default = LocalDB;
+}
+
+/* istanbul ignore next */
+if (typeof window !== 'undefined') {
+  window.LocalDB = LocalDB;
+}
+
 
 function guid() {
   function s4() {
