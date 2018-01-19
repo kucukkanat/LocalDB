@@ -79,6 +79,23 @@ usersTable.drop()
 **returns :** LocalDB instance itself
 
 
+### .on(eventName,fn)
+Listens for events : `insert` , `create` , `update` , `remove` , `delete` , `drop`
+
+```
+users.on('$insert',(object)=>{
+    // console.log(object, ' inserted!')
+})
+users.on('$delete',(object)=>{
+    // console.log(object, ' deleted!')
+})
+users.on('$update',(object,nextObject)=>{
+    console.log(object, ' updated to ',nextObject)
+})
+```
+**returns :** LocalDB instance itself
+
+
 
 ## Supported Operators:
 

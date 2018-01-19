@@ -95,12 +95,14 @@ export default class LocalDB {
       name,
       fn
     })
+    return this
   }
   emit(name, ...payload) {
     sift({name:name},this.eventListeners)
     .forEach((eventListener) => {
       eventListener.fn.apply(this.getTable(),payload)
     })
+    return this
   }
 }
 
