@@ -22,7 +22,7 @@ import LocalDB from 'local-db'
 ```
 or
 ```javascript
-var LocalDB = require('local-db)
+var LocalDB = require('local-db')
 ```
 
 then
