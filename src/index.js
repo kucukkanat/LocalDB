@@ -1,4 +1,4 @@
-import sift from 'sift'
+import sift from './sift'
 import _ from 'lodash'
 export default class LocalDB {
   constructor(tableName,debug) {
@@ -63,7 +63,9 @@ export default class LocalDB {
     const updatedTable = sift(queryObj,table)
     .forEach((row)=>{
       const index = table.indexOf(row)
-      table[index] = _.merge(row,objectToMerge)
+      const nextObject = _.merge({},row,objectToMerge)
+      this.emit('$update',row,nextObject)
+      table[index] = nextObject
     })
     
     localStorage[this.name] = JSON.stringify(table)
@@ -93,10 +95,10 @@ export default class LocalDB {
       fn
     })
   }
-  emit(name, payload) {
+  emit(name, ...payload) {
     sift({name:name},this.eventListeners)
     .forEach((eventListener) => {
-      eventListener.fn(payload)
+      eventListener.fn.apply(this.getTable(),payload)
     })
   }
 }

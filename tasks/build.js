@@ -2,7 +2,7 @@ const gulp = require('gulp')
 const webpack = require('webpack-stream')
 const path = require('path')
 module.exports = function () {
-    const task = gulp.src('src/index.js')
+    let task = gulp.src('src/index.js')
         .pipe(webpack({
             entry: {
                 release: "./src/index.js"
