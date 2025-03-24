@@ -7,7 +7,7 @@
 		"url": "https://github.com/kucukkanat/LocalDB/issues"
 	},
 	"license": "ISC",
-	"author": "htolgasahin@gmail.com",
+	"author": "loremipsum@gmail.com",
 	"main": "dist/release.js",
 	"repository": {
 		"type": "git",
